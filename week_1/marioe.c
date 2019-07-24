@@ -45,10 +45,10 @@ int main(void)
     }
     else if (input == 2)
     {
-        printf("%s\n%s\n", h1, h2);
+        printf(" #\n##\n");
     }
     else if (input == 1)
     {
-        printf("%s\n", h1);
+        printf("#\n");
     }
 }
