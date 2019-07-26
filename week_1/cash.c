@@ -4,71 +4,56 @@
 #include <math.h>
 
 int main()
+    // Prompt user for input
 {
-    float f;
-    do
+    float total;
+    do 
     {
-        f = get_float("Change: ");
+        total = get_float("Change: ");
     }
+    
+    while (total < 0.01 || total > 9999999);
+    
+    // Round to 100 and create change variables
+    
+    total = (int)(total* 100);
 
-    while (f < 0.01 || f > 9999999);
-    f = (int)(f * 100);
-    //     printf("%.2f", f);
-    //     printf("F is %.2f and int is %d\n", f, (int)(f* 100));
-
-    return 0;
-}
-
-#include <cs50.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-int main()
-{
-    float f;
-    do
-    {
-        f = get_float("Change: ");
-    }
-
-    while (f < 0.01 || f > 9999999);
-    f = (int)(f * 100);
-    //     printf("%.2f", f);
-    float q = .25;
-    float d = .1;
-    float n = .05;
-    float p = .01;
-
+    float q = 25;
+    float d = 10;
+    float n = 5;
+    float p = 1;
+    
     int count = 0;
-
-    while (q < f)
+    
+    // Increase coin count and subract total while true
+    
+    while (q <= total) 
     {
         count++;
-        f - q;
+        total = total - q;
     }
-
-    while (.1 < f)
+    
+        while (d <= total) 
     {
         count++;
-        f - d;
+        total = total - d;
     }
-
-    while (n < f)
+    
+        while (n <= total) 
     {
         count++;
-        f - n;
+        total = total - n;
     }
-
-    while (.01 < f)
+    
+        while (p < total) 
     {
         count++;
-        f - p;
+        total = total - p;
     }
-
+    
+    // Return count to user
+    
     printf("You will have %i coins returned back\n", count);
-
-    //     printf("F is %.2f and int is %d\n", f, (int)(f* 100));
-
+    
     return 0;
 }
