@@ -33,20 +33,24 @@ bits that define each pixel and the maximum number of colors in the bitmap.
 
 ## Why might `fopen` return `NULL` in `copy.c`?
 
-TODO
+fopen might return a NULL pointer if the file that fopen is trying to
+write to doesn't exist.
 
 ## Why is the third argument to `fread` always `1` in our code?
 
-TODO
+fread's third argument is always 1 because we are iterating over every
+pixel.
 
 ## What value does `copy.c` assign to `padding` if `bi.biWidth` is `3`?
 
-TODO
+If biWidth is 3:
+int padding = (4 - (bi.biWidth \* sizeof(RGBTRIPLE)) % 4) % 4 = 3.
+This step ensures the number of bytes in every row is a multiple of 4.
 
 ## What does `fseek` do?
 
-TODO
+fseek allows us to change the offset of a pointer.
 
 ## What is `SEEK_CUR`?
 
-TODO
+SEEK_CUR is the current position indicator in the file.
