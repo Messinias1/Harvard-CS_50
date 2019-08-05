@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
     // determine padding for scanlines
     int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
+    // New header variables
     BITMAPFILEHEADER newBf = bf;
     BITMAPINFOHEADER newBi = bi;
 
@@ -86,29 +87,37 @@ int main(int argc, char *argv[])
     // iterate over infile's scanlines
     for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
     {
-        // iterate over pixels in scanline
-        for (int j = 0; j < bi.biWidth; j++)
+        for (int vert = 0; vert < n; vert++)
         {
-            // temporary storage
-            RGBTRIPLE triple;
-
-            // read RGB triple from infile
-            fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
-
-            for (int w = 0; w < n; w++)
+            // iterate over pixels in scanline
+            for (int j = 0; j < bi.biWidth; j++)
             {
-                // write RGB triple to outfile
-                fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+                // temporary storage
+                RGBTRIPLE triple;
+
+                // read RGB triple from infile
+                fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
+
+                // Loop into each pixel and output width
+                for (int w = 0; w < n; w++)
+                {
+                    // write RGB triple to outfile
+                    fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+                }
             }
-        }
+            // skip over padding, if any
+            fseek(inptr, padding, SEEK_CUR);
 
-        // skip over padding, if any
-        fseek(inptr, padding, SEEK_CUR);
+            // Write outfile's padding
+            for (int k = 0; k < newPadding; k++)
+            {
+                fputc(0x00, outptr);
+            }
 
-        // Write outfile's padding
-        for (int k = 0; k < newPadding; k++)
-        {
-            fputc(0x00, outptr);
+            if (vert < n - 1)
+            {
+                fseek(inptr, -(bi.biWidth * 3 + padding), SEEK_CUR);
+            }
         }
     }
 
