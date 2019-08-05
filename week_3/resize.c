@@ -62,16 +62,26 @@ int main(int argc, char *argv[])
         fclose(inptr);
         fprintf(stderr, "Unsupported file format.\n");
         return 4;
-
-        // write outfile's BITMAPFILEHEADER
-        fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
-
-        // write outfile's BITMAPINFOHEADER
-        fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
     }
 
     // determine padding for scanlines
     int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+
+    BITMAPFILEHEADER newBf = bf;
+    BITMAPINFOHEADER newBi = bi;
+
+    newBi.biWidth *= n;
+    newBi.biHeight *= n;
+
+    int newPadding = (4 - (newBi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    newBi.biSizeImage = ((sizeof(RGBTRIPLE) * newBi.biWidth) + newPadding) * abs(newBi.biHeight);
+    newBf.bfSize = newBi.biSizeImage + sizeof(BITMAPINFOHEADER) + sizeof(BITMAPFILEHEADER);
+
+    // write outfile's BITMAPFILEHEADER
+    fwrite(&newBf, sizeof(BITMAPFILEHEADER), 1, outptr);
+
+    // write outfile's BITMAPINFOHEADER
+    fwrite(&newBi, sizeof(BITMAPINFOHEADER), 1, outptr);
 
     // iterate over infile's scanlines
     for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
@@ -79,28 +89,27 @@ int main(int argc, char *argv[])
         // iterate over pixels in scanline
         for (int j = 0; j < bi.biWidth; j++)
         {
-
-            bi.biWidth *= n;
-            fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
-
             // temporary storage
             RGBTRIPLE triple;
 
             // read RGB triple from infile
             fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
 
-            // write RGB triple to outfile
-            fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
-        }
-
-        // Write outfile's padding
-        for (int k = 0; k < padding; k++)
-        {
-            fputc(0x00, outptr);
+            for (int w = 0; w < n; w++)
+            {
+                // write RGB triple to outfile
+                fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+            }
         }
 
         // skip over padding, if any
         fseek(inptr, padding, SEEK_CUR);
+
+        // Write outfile's padding
+        for (int k = 0; k < newPadding; k++)
+        {
+            fputc(0x00, outptr);
+        }
     }
 
     // close infile
