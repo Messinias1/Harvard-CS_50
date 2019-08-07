@@ -16,10 +16,22 @@ typedef struct node
 {
     char word[LENGTH + 1];
     struct node *next;
-} node;
+}
+node;
+
+int dic_size = 0;
 
 // Represents a hash table
 node *hashtable[N];
+
+// hash funtion
+int h(const char *word)
+{
+    unsigned int h = 0;
+    for (int i = 0, n = strlen(word); i < n; i++)
+        h = (h << 2) ^ word[i];
+    return h % N;
+}
 
 // Hashes word to a number between 0 and 25, inclusive, based on its first letter
 unsigned int hash(const char *word)
@@ -51,27 +63,45 @@ bool load(const char *dictionary)
     while (fscanf(file, "%s", word) != EOF)
     {
         // TODO tttttttttttttttttttttttttttttttttttttttttttttt
+        // node *newWord = malloc(sizeof(node));
+        // if (newWord == NULL)
+        // {
+        //     unload();
+        //     return false;
+        // } else
+        // {
+        //     strcpy(newWord->word, word);
+
+        //     newWord->next = head;
+        //     head = newWord;
+        // }
+
+         // create a temporary node
         node *newWord = malloc(sizeof(node));
-        if (newWord == NULL)
-        {
-            unload();
-            return false;
-        }
+
+        strncpy(newWord->word, word, sizeof(word));
+
+        // implement hash function to get the index
+        int index = h(word);
+
+        // if the corresponding index in hashtable is empty, assign it to the temp node
+        if (hashtable[index] == NULL)
+            hashtable[index] = newWord;
+
+        // else append temp to the start of the linked list
         else
         {
-            strcpy(newWord->word, word);
-
-            newWord->next = hash;
-            hash = newWord;
+            newWord->next = hashtable[index];
+            hashtable[index] = newWord;
         }
+        dic_size ++;
     }
-
     // Close dictionary
     fclose(file);
 
     // Indicate success
     return true;
-}
+    }
 
 // Returns number of words in dictionary if loaded else 0 if not yet loaded
 unsigned int size(void)
