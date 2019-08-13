@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
     newBi.biHeight *= n;
 
     int newPadding = (4 - (newBi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+
     newBi.biSizeImage = ((sizeof(RGBTRIPLE) * newBi.biWidth) + newPadding) * abs(newBi.biHeight);
     newBf.bfSize = newBi.biSizeImage + sizeof(BITMAPINFOHEADER) + sizeof(BITMAPFILEHEADER);
 

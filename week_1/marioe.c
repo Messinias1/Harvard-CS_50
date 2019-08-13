@@ -4,11 +4,14 @@
 
 int main(void)
 {
+    // Prompt user for height until correct input between 1 and 8
     int input;
     do
     {
         input = get_int("Height: ");
     } while (input > 8 || input < 1);
+
+    // Initialize hash variables
 
     char h1[] = "       #";
     char h2[] = "      ##";
@@ -18,6 +21,7 @@ int main(void)
     char h6[] = "  ######";
     char h7[] = " #######";
     char h8[] = "########";
+    // Input = hash variable to new line
 
     if (input == 8)
     {
