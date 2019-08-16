@@ -11,6 +11,11 @@ def main():
 
     userInput = get_string("What line would you like to censor? \n")
 
+    path = "banned.txt"
+    banned_file = open(path,'r')
+    wordList = banned_file.readlines() # maybe readline, read or readlines here?
+    print(wordList)
+
 
 if __name__ == "__main__":
     main()
