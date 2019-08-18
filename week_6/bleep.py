@@ -13,8 +13,16 @@ def main():
 
     path = "banned.txt"
     banned_file = open(path,'r')
-    wordList = banned_file.readlines() # maybe readline, read or readlines here?
-    print(wordList)
+    file_word_list = banned_file.read()
+
+    inputList = userInput.split()
+    print(inputList)
+    # print(file_word_list)
+
+    for word in inputList:
+        if word.lower() in file_word_list:
+            hashed = "*" * len(word)
+            print(userInput.replace(word, hashed))
 
 
 if __name__ == "__main__":
