@@ -2,7 +2,10 @@ def lines(a, b):
     """Return lines in both a and b"""
 
     # TODO
-    return []
+    file_a = a.split("\n")
+    file_b = b.split("\n")
+    print(file_a, file_b)
+    return file_a, file_b
 
 
 def sentences(a, b):
