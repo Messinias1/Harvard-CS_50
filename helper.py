@@ -1,18 +1,26 @@
+from nltk.tokenize import sent_tokenize
+
 def lines(a, b):
     """Return lines in both a and b"""
 
     # TODO
-    file_a = a.split("\n")
-    file_b = b.split("\n")
-    print(file_a, file_b)
-    return file_a, file_b
+    file1 = set(a.split("\n"))
+    file2 = set(b.split("\n"))
+
+    print(file1, file2)
+    print(file1 & file2)
+
+    return file1 & file2
 
 
 def sentences(a, b):
     """Return sentences in both a and b"""
 
     # TODO
-    return []
+    file1 = set(sent_tokenize(a))
+    file2 = set(sent_tokenize(b))
+    print(file1, file2)
+    return file1 & file2
 
 
 def substrings(a, b, n):
