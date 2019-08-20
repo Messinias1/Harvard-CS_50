@@ -1,5 +1,6 @@
 from nltk.tokenize import sent_tokenize
 
+
 def lines(a, b):
     """Return lines in both a and b"""
 
@@ -27,16 +28,14 @@ def substrings(a, b, n):
     """Return substrings of length n in both a and b"""
 
     # TODO
-    file1_sub = set()
-    file2_sub = set()
+    file1 = set()
+    file2 = set()
 
     for i in range(len(a) - n + 1):
-        file1_sub.add(a[i:i + n])
+        file1.add(a[i:i + n])
         # print(file1_sub)
     for i in range(len(b) - n + 1):
-        file2_sub.add(b[i:i + n])
+        file2.add(b[i:i + n])
 
-    print(file1_sub & file2_sub)
-
-
-    return []
+    print(file1 & file2)
+    return file1 & file2
