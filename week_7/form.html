@@ -13,16 +13,20 @@
     <input
       type="text"
       class="form-control"
+      id="name-input"
+      name="Name"
       aria-label="Sizing example input"
       aria-describedby="inputGroup-sizing-default"
     />
   </div>
 
   <div class="form-group col-md-4">
-    <label for="inputState">State</label>
-    <select id="inputState" class="form-control">
-      <option selected>Choose...</option>
-      <option>...</option>
+    <label for="inputState">Faction</label>
+    <select id="inputState" class="form-control" name="Faction">
+      <option>NCR</option>
+      <option>Mr. House</option>
+      <option>Yes Man</option>
+      <option>Caesar's Legion</option>
     </select>
   </div>
 
@@ -30,36 +34,36 @@
     <input
       class="form-check-input"
       type="radio"
-      name="exampleRadios"
+      name="Role"
       id="exampleRadios1"
-      value="option1"
+      value="Juggernaut"
     />
     <label class="form-check-label" for="exampleRadios1">
-      Default radio
+      Juggernaut
     </label>
   </div>
   <div class="form-check">
     <input
       class="form-check-input"
       type="radio"
-      name="exampleRadios"
+      name="Role"
       id="exampleRadios2"
-      value="option2"
+      value="Sniper"
     />
     <label class="form-check-label" for="exampleRadios2">
-      Second default radio
+      Sniper
     </label>
   </div>
   <div class="form-check">
     <input
       class="form-check-input"
       type="radio"
-      name="exampleRadios"
+      name="Role"
       id="exampleRadios3"
-      value="option3"
+      value="Melee"
     />
     <label class="form-check-label" for="exampleRadios3">
-      Disabled radio
+      Melee
     </label>
   </div>
 
@@ -67,8 +71,26 @@
   <button class="btn btn-primary" type="submit">Submit</button>
 </form>
 
-<script>
+<script type="text/javascript">
   /* TODO */
+  function empty()
+        {
+          var x;
+          x = document.getElementById("name-input").value;
+          if (x == "")
+           {
+              alert("Enter a Name");
+           };
+        }
+    function empty1()
+        {
+          var x;
+          x = document.getElementById("inputState").value;
+          if (x == null)
+           {
+              alert("Select a faction");
+           };
+        }
 </script>
 
 {% endblock %}
