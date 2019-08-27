@@ -129,14 +129,15 @@ def quote():
         # print(quote["name"]) = Netflix, Inc.
         # print(quote["price"]) = 289.2
         # print(quote["symbol"]) = NFLX
-        # name = quote["name"]
-        # price = quote["price"]
-        # symbol = quote["symbol"]
 
         if quote == None:
             return apology("Stock does not exist", 403)
 
-        return render_template("quoted.html", quote=quote)
+        name = quote["name"]
+        price = quote["price"]
+        symbol = quote["symbol"]
+
+        return render_template("quoted.html", name=name, price=price, symbol=symbol)
 
     return render_template("quote.html")
 
