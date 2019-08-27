@@ -51,7 +51,40 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+
+    if request.method == "POST":
+
+        # Render an apology if the input is blank or does not exist
+        quote = lookup(request.form.get("symbol"))
+
+        if request.form.get("symbol") == "":
+            return apology("Please Enter in a stock", 403)
+
+        elif quote == None:
+            return apology("Stock does not exist", 403)
+        print(quote)
+
+        # call lookup to look up a stock’s current price.
+        price = quote["price"]
+        print("Price:", price)
+
+        # Get current user's cash
+        funds = db.execute("SELECT cash FROM users WHERE id = 2")
+        print(funds[0]["cash"])
+
+        shareInput = int(request.form.get("shares"))
+        print(shareInput)
+        # Require that a user input a number of shares, Render an apology if the input is not a positive integer.
+        if shareInput < 1:
+            return apology("Please input a positive number of shares", 403)
+
+        if funds[0]["cash"] < price * shareInput:
+            return apology("Sorry you have insufficient funds for this purchase", 403)
+
+        print(funds[0]["cash"] - (price * shareInput))
+
+
+    return render_template("buy.html")
 
 
 @app.route("/check", methods=["GET"])
