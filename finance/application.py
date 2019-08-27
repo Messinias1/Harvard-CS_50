@@ -122,7 +122,23 @@ def logout():
 @login_required
 def quote():
     """Get stock quote."""
-    return apology("TODO")
+
+    if request.method == "POST":
+        quote = lookup(request.form.get("symbol")) # quote = {'name': 'Netflix, Inc.', 'price': 289.2, 'symbol': 'NFLX'}
+        print(quote)
+        # print(quote["name"]) = Netflix, Inc.
+        # print(quote["price"]) = 289.2
+        # print(quote["symbol"]) = NFLX
+        # name = quote["name"]
+        # price = quote["price"]
+        # symbol = quote["symbol"]
+
+        if quote == None:
+            return apology("Stock does not exist", 403)
+
+        return render_template("quoted.html", quote=quote)
+
+    return render_template("quote.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
