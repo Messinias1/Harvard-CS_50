@@ -86,6 +86,11 @@ def buy():
         db.execute("INSERT INTO purchases (id, stock, shares, price), VALUES (:id, :stock, :shares, :price)",
             id = session["user_id"], stock = quote["symbol"], shares = shareInput, price = "$" + quote["price"])
 
+        # update users cash
+        db.execute("UPDATE users SET cash = cash - :purchase WHERE id = :id",
+            id = session["user_id"],
+            purchase = shareInput * price)
+
 
     return render_template("buy.html")
 
