@@ -69,7 +69,7 @@ def buy():
         print("Price:", price)
 
         # Get current user's cash
-        funds = db.execute("SELECT cash FROM users WHERE id = 2")
+        funds = db.execute("SELECT cash FROM users WHERE id = :id", id = session["user_id"])
         print(funds[0]["cash"])
 
         shareInput = int(request.form.get("shares"))
@@ -82,6 +82,9 @@ def buy():
             return apology("Sorry you have insufficient funds for this purchase", 403)
 
         print(funds[0]["cash"] - (price * shareInput))
+
+        db.execute("INSERT INTO purchases (id, stock, shares, price), VALUES (:id, :stock, :shares, :price)",
+            id = session["user_id"], stock = quote["symbol"], shares = shareInput, price = "$" + quote["price"])
 
 
     return render_template("buy.html")
