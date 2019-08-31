@@ -44,7 +44,29 @@ if not os.environ.get("API_KEY"):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+
+
+    stocks = db.execute("SELECT stock, shares, price FROM purchases WHERE id = :id", id = session['user_id'])
+
+    result = db.execute("SELECT cash FROM users WHERE id = :id", id = session['user_id'])
+
+    total_cash = float(result[0]['cash'])
+
+    grand_total = total_cash
+
+    for stock in stocks:
+        symbol = stock["stock"]
+        print(symbol)
+        shares = stock["shares"]
+        print("share", shares)
+        quote = lookup(symbol)
+        print(quote)
+        price = float(quote["price"])
+        print("price", price)
+        total = float(price * shares)
+    grand_total += total
+
+    return render_template("index.html", stocks = stocks, cash = total_cash, grand_total = grand_total)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -74,6 +96,7 @@ def buy():
 
         shareInput = int(request.form.get("shares"))
         print(shareInput)
+
         # Require that a user input a number of shares, Render an apology if the input is not a positive integer.
         if shareInput < 1:
             return apology("Please input a positive number of shares", 403)
@@ -83,8 +106,12 @@ def buy():
 
         print(funds[0]["cash"] - (price * shareInput))
 
-        db.execute("INSERT INTO purchases (id, stock, shares, price), VALUES (:id, :stock, :shares, :price)",
-            id = session["user_id"], stock = quote["symbol"], shares = shareInput, price = "$" + quote["price"])
+        # update purchases history
+        db.execute("INSERT INTO purchases (id, stock, shares, price) VALUES (:id, :stock, :shares, :price)",
+            id = session["user_id"],
+            stock = quote["symbol"],
+            shares = shareInput,
+            price = usd(quote["price"]))
 
         # update users cash
         db.execute("UPDATE users SET cash = cash - :purchase WHERE id = :id",
