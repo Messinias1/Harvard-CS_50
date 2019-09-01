@@ -64,7 +64,7 @@ def index():
         price = float(quote["price"])
         print("price", price)
         total = float(price * shares)
-    grand_total += total
+        grand_total += total
 
     return render_template("index.html", stocks = stocks, cash = total_cash, grand_total = grand_total)
 
@@ -80,29 +80,29 @@ def buy():
         quote = lookup(request.form.get("symbol"))
 
         if request.form.get("symbol") == "":
-            return apology("Please Enter in a stock", 403)
+            return apology("Please Enter in a stock", 400)
 
         elif quote == None:
-            return apology("Stock does not exist", 403)
+            return apology("Stock does not exist", 400)
         print(quote)
 
         # call lookup to look up a stock’s current price.
-        price = quote["price"]
+        price = float(quote["price"])
         print("Price:", price)
 
         # Get current user's cash
         funds = db.execute("SELECT cash FROM users WHERE id = :id", id = session["user_id"])
         print(funds[0]["cash"])
 
-        shareInput = int(request.form.get("shares"))
+        shareInput = float(request.form.get("shares"))
         print(shareInput)
 
         # Require that a user input a number of shares, Render an apology if the input is not a positive integer.
         if shareInput < 1:
-            return apology("Please input a positive number of shares", 403)
+            return apology("Please input a positive number of shares", 400)
 
         if funds[0]["cash"] < price * shareInput:
-            return apology("Sorry you have insufficient funds for this purchase", 403)
+            return apology("Sorry you have insufficient funds for this purchase", 400)
 
         print(funds[0]["cash"] - (price * shareInput))
 
@@ -118,6 +118,11 @@ def buy():
             id = session["user_id"],
             purchase = shareInput * price)
 
+        db.execute("INSERT INTO histories (id, stock, shares, price) VALUES (:id, :stock, :shares, :price)",
+            id = session["user_id"],
+            stock = quote["symbol"],
+            shares = shareInput,
+            price = usd(quote["price"]))
 
     return render_template("buy.html")
 
@@ -125,14 +130,22 @@ def buy():
 @app.route("/check", methods=["GET"])
 def check():
     """Return true if username available, else false, in JSON format"""
-    return jsonify("TODO")
+
+    username = request.form.get("username")
+    if (len(username) > 0) or (len(db.execute("SELECT * FROM users WHERE username = :username", username=username)) == 0):
+        return jsonify(True)
+    else:
+        return jsonify(False)
 
 
 @app.route("/history")
 @login_required
 def history():
     """Show history of transactions"""
-    return apology("TODO")
+
+    histories = db.execute("SELECT * from histories WHERE id=:id", id=session["user_id"])
+
+    return render_template("history.html", histories=histories)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -199,11 +212,14 @@ def quote():
         # print(quote["symbol"]) = NFLX
 
         if quote == None:
-            return apology("Stock does not exist", 403)
+            return apology("Stock does not exist", 400)
 
         name = quote["name"]
-        price = quote["price"]
+        price = float(quote["price"])
         symbol = quote["symbol"]
+
+        if symbol == None:
+            return apology("Stock does not exist", 400)
 
         return render_template("quoted.html", name=name, price=price, symbol=symbol)
 
@@ -222,22 +238,22 @@ def register():
 
         # Render an apology if the user’s input is blank
         if not request.form.get("username"):
-            return apology("must provide username", 403)
+            return apology("must provide username", 400)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password", 403)
+            return apology("must provide password", 400)
 
         # Ensure confirmation was submitted
         elif not request.form.get("confirmation"):
-            return apology("must provide password confirmation", 403)
+            return apology("must provide password confirmation", 400)
 
         # Check if passwords match
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
 
         if password != confirmation:
-            return apology("passwords do not match", 403)
+            return apology("passwords do not match", 400)
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = :username",
@@ -245,7 +261,7 @@ def register():
 
         # Check if username already exists
         if len(rows) == 1:
-            return apology("Username already exists", 403)
+            return apology("Username already exists", 400)
 
         username = request.form.get("username")
 
@@ -309,6 +325,12 @@ def sell():
         # Book keeping (TODO: should be wrapped with a transaction)
         db.execute("UPDATE users SET cash = cash + :price WHERE id = :id", price=total_price, id=session["user_id"])
         db.execute("INSERT INTO purchases (id, stock, shares, price) VALUES(:id, :stock, :shares, :price)",
+                   id=session["user_id"],
+                   stock=request.form.get("stock"),
+                   shares=-shares,
+                   price=price)
+
+        db.execute("INSERT INTO histories (id, stock, shares, price) VALUES(:id, :stock, :shares, :price)",
                    id=session["user_id"],
                    stock=request.form.get("stock"),
                    shares=-shares,
