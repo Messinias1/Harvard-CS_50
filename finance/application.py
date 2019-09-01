@@ -271,7 +271,58 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+
+    if request.method == "POST":
+        quote = lookup(request.form.get("stock"))
+
+        # Check if the symbol exists
+        if quote == None:
+            return apology("invalid symbol", 400)
+
+        # Check if shares was a positive integer
+        try:
+            shares = int(request.form.get("shares"))
+        except:
+            return apology("shares must be a positive integer", 400)
+
+        # Check if # of shares requested was 0
+        if shares <= 0:
+            return apology("can't sell less than or 0 shares", 400)
+
+        # Check if we have enough shares
+        stock = db.execute("SELECT SUM(shares) as total_shares FROM purchases WHERE id = :id AND stock = :stock GROUP BY stock",
+                           id=session["user_id"], stock=request.form.get("stock"))
+
+        if len(stock) != 1 or stock[0]["total_shares"] <= 0 or stock[0]["total_shares"] < shares:
+            return apology("you can't sell less than 0 or more than you own", 400)
+
+        # Query database for username
+        rows = db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])
+
+        # How much $$$ the user still has in her account
+        cash_remaining = rows[0]["cash"]
+        price = quote["price"]
+
+        # Calculate the price of requested shares
+        total_price = price * shares
+
+        # Book keeping (TODO: should be wrapped with a transaction)
+        db.execute("UPDATE users SET cash = cash + :price WHERE id = :id", price=total_price, id=session["user_id"])
+        db.execute("INSERT INTO purchases (id, stock, shares, price) VALUES(:id, :stock, :shares, :price)",
+                   id=session["user_id"],
+                   stock=request.form.get("stock"),
+                   shares=-shares,
+                   price=price)
+
+        flash("Sold!")
+
+        return redirect("/")
+
+    else:
+        stocks = db.execute(
+            "SELECT stock, SUM(shares) as total_shares FROM purchases WHERE id = :id GROUP BY stock HAVING total_shares > 0", id=session["user_id"])
+
+        return render_template("sell.html", stocks=stocks)
 
 
 def errorhandler(e):
